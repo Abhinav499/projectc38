@@ -34,42 +34,49 @@ function preload(){
 
 function setup() {
   createCanvas(400,400);
-  ground = createSprite(200,200,400,10);
+
+  camera.x=camera.x+200;
+  camera.y=camera.y+300;
+
+  ground = createSprite(camera.x,camera.y-100,400,10);
   ground.addImage("ground",groundImage);
   ground.x = ground.width/2;
 
-  monkey = createSprite(44,200,20,200);
+  monkey = createSprite(camera.x-136,camera.y,20,200);
   monkey.addAnimation("monkey",monkey_running);
   monkey.scale = 0.1;
   monkey.addAnimation("monkeyStop",monkeyStop);
   
-  invisibleGround = createSprite(200,345,400,10);
+  invisibleGround = createSprite(camera.x,camera.y+45,400,10);
   invisibleGround.visible = false;
   
   obstaclesGroup = createGroup();
   
-  gameOver = createSprite(200,200,10,10);
+  gameOver = createSprite(camera.x,camera.y,10,10);
   gameOver.addImage(gameOverImage);
   gameOver.visible = false;
   
   monkey.setCollider("circle",0,0,150);
   
   
-  retry = createSprite(200,330,10,10);
+  retry = createSprite(camera.x,camera.y+70,10,10);
   retry.addImage(retryImage);
   retry.scale = 0.2;
   retry.visible = false;
 
   bananaGroup = createGroup();
- 
+
 }
 
 function draw() {
   background(220);
+  console.log("x",camera.x);
+  console.log("y",camera.y);
+ 
   if(gameState==="play"){
        score = score + Math.round(getFrameRate()/61);
      ground.velocityX = -4;
-  if(ground.x<100){
+  if(ground.x<camera.x-100){
    ground.x = ground.width/2;
   }
     
@@ -85,7 +92,7 @@ function draw() {
       bananaGroup.destroyEach();
       obstaclesGroup.destroyEach();
     }
-     if(keyDown("space") && monkey.y>=300){
+     if(keyDown("space") && monkey.y>=camera.y){
     monkey.velocityY = -12;
   }
     
@@ -108,15 +115,12 @@ function draw() {
     gameState= "end"
   }
   }
-
-  console.log(ground.x);
-  
   drawSprites();
   
   fill("darkblue");
   textSize(20);
-  text("SCORE: "+score,280,20);
-  text("POINTS: "+points,10,20);
+  text("SCORE: "+score,camera.x+60,camera.y+150);
+  text("POINTS: "+points,camera.x-150,camera.y+150);
   
    if(gameState === "end"){
    
@@ -128,12 +132,13 @@ function draw() {
         
    
    fill("white");
-   text("SCORE: "+score,200,275);
-   text("Press Reload Button to \nrestart!!",100,120);
-     text("POINTS: "+points,80,275);
+   text("SCORE: "+score,camera.x,camera.y-50);
+   text("Press Reload Button to \nrestart!!",camera.x-100,camera.y-180);
+     text("POINTS: "+points,camera.x-120,camera.y-50);
    
    obstaclesGroup.setLifetimeEach(-1);
-     bananaGroup.setLifetimeEach(-1);   monkey.changeAnimation("monkeyStop",monkeyStop);
+     bananaGroup.setLifetimeEach(-1);   
+     monkey.changeAnimation("monkeyStop",monkeyStop);
    
    obstaclesGroup.setVelocityXEach(0);
      bananaGroup.setVelocityXEach(0);
@@ -147,12 +152,12 @@ function obstacles(){
 
    if(frameCount % 80 === 0){
 
-             var obstacle = createSprite(400,326,10,10);
+             var obstacle = createSprite(camera.x+200,camera.y+26,10,10);
              obstacle.addImage("obstacle",obstacleImage);
              obstacle.scale = 0.15;
              obstacle.velocityX = -(4+score/100);
              obstacle.lifetime = 100;
-     obstacle.debug= true;
+     //obstacle.debug= true;
      obstacle.setCollider("circle",0,0,150)
      
      var rand = Math.round(random(1,4));
@@ -191,7 +196,7 @@ function restart(){
 }
 function bananas(){
   if(frameCount % 80 === 0){
-        var banana = createSprite(400,230,10,10);
+        var banana = createSprite(camera.x+200,camera.y-70,10,10);
         banana.addImage(bananaImage);
         banana.velocityX= -(4+score/100);
         banana.scale=0.09;
