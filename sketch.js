@@ -28,6 +28,7 @@ function preload(){
   retryImage = loadImage("retry.png");
   
   bananaImage = loadImage("banana.png");
+  winningImg = loadImage("you win.jpg");
 }
 
 
@@ -55,6 +56,10 @@ function setup() {
   gameOver = createSprite(camera.x,camera.y,10,10);
   gameOver.addImage(gameOverImage);
   gameOver.visible = false;
+  youwin = createSprite(camera.x,camera.y,10,10);
+  youwin.addImage(winningImg);
+  youwin.scale=0.6;
+  youwin.visible = false;
   
   monkey.setCollider("circle",0,0,150);
   
@@ -70,8 +75,6 @@ function setup() {
 
 function draw() {
   background(220);
-  console.log("x",camera.x);
-  console.log("y",camera.y);
  
   if(gameState==="play"){
        score = score + Math.round(getFrameRate()/61);
@@ -103,25 +106,32 @@ function draw() {
       obstaclesGroup.destroyEach();
  }
     switch(points){
-        case 10: monkey.scale= monkey.scale+0.001111;
+        case 10: monkey.scale= monkey.scale+0.0001111;
         break;
-        case 20: monkey.scale= monkey.scale+0.002222;
+        case 20: monkey.scale= monkey.scale+0.0002222;
         break;
-        case 30: monkey.scale= monkey.scale+0.003333;
+        case 30: monkey.scale= monkey.scale+0.0003333;
         break;
         default: break;
     }
   if(monkey.scale<0.06|| points<-4){
     gameState= "end"
   }
-  }
+}
   drawSprites();
-  
+  fill("red");
+  textSize(20);
+  text("SCORE 100+ OR 10 POINTS TO WIN",camera.x-170,camera.y-150)
   fill("darkblue");
   textSize(20);
+
   text("SCORE: "+score,camera.x+60,camera.y+150);
   text("POINTS: "+points,camera.x-150,camera.y+150);
   
+    if(points>=10 || score>=100){
+    gameState= "win"
+    }
+
    if(gameState === "end"){
    
    gameOver.visible = true;
@@ -143,7 +153,27 @@ function draw() {
    obstaclesGroup.setVelocityXEach(0);
      bananaGroup.setVelocityXEach(0);
  }
-  
+ if (gameState === "win"){
+     youwin.visible=true;
+     retry.visible=true;
+
+     monkey.velocityY=0;
+     monkey.velocityX=0;
+     ground.velocityX=0;
+
+     fill("red");
+ 
+     text("Press Replay Button to restart!!",camera.x-120,camera.y-100);
+
+       
+       obstaclesGroup.setLifetimeEach(-1);
+       bananaGroup.setLifetimeEach(-1);   
+       monkey.changeAnimation("monkeyStop",monkeyStop);
+     
+     obstaclesGroup.setVelocityXEach(0);
+       bananaGroup.setVelocityXEach(0);
+      } 
+
   if(mousePressedOver(retry)){
     restart();
   }
@@ -187,6 +217,7 @@ function restart(){
         gameState = "play";
         retry.visible = false;
         gameOver.visible = false;
+        youwin.visible = false;
         obstaclesGroup.destroyEach();
         monkey.changeAnimation("monkey",monkey_running);
         monkey.scale=0.1;
